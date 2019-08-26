@@ -13,7 +13,7 @@ export class CategoriaService {
 
   constructor(private http: HttpClient) { }
 
-  getAll(): Observable<Categoria[]>{
+  getAll(): Observable<Categoria[]> {
     return this.http.get(this.apiPath).pipe(
       catchError(this.handleError),
       map(this.jsonDataToCategorias)
