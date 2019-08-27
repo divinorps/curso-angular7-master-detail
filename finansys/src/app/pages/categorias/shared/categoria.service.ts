@@ -37,7 +37,7 @@ export class CategoriaService {
 
   atualiza(categoria: Categoria): Observable<Categoria> {
     const url = `${this.apiPath}/${categoria.id}`;
-    return this.http.put(url, categoria).pipe(
+    return this.http.put('teste', categoria).pipe(
       catchError(this.handleError),
       map(() => categoria)
     );
@@ -60,6 +60,7 @@ export class CategoriaService {
   jsonDataToCategoria(jsonData: any): Categoria {
     return jsonData as Categoria;
   }
+
   handleError(error: any): Observable<any> {
     console.log('Erro na requisição => ', error);
     return throwError(error);
