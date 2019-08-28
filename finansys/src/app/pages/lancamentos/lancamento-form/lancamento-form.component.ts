@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { switchMap } from 'rxjs/operators';
+import { Categoria } from '../../categorias/shared/categoria.model';
+import { CategoriaService } from '../../categorias/shared/categoria.service';
 import { Lancamento } from '../shared/lancamento.model';
 import { LancamentoService } from '../shared/lancamento.service';
 
@@ -18,17 +20,41 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
   ServerErrorMessages: string[] = null;
   submmitingForm = false;
   lancamento: Lancamento = new Lancamento();
+  categorias: Array<Categoria>;
+
+  imaskConfig = {
+    mask: Number,
+    scale: 2,
+    thousandsSeparator: '',
+    padFranctionalZeros: true,
+    normalizeZwwros: true,
+    radix: ','
+  };
+
+  ptBR = {
+    firstDayOfWeek: 0,
+    dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+    dayNamesMin: ['Do', 'Se', 'Te', 'Qu', 'Qu', 'Se', 'Sa'],
+    monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
+      'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    today: 'Hoje',
+    clear: 'Limpar'
+  };
 
   constructor(private lancamentoService: LancamentoService,
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
-    private toastr: ToastrService) { }
+    private toastr: ToastrService,
+    private categoriaService: CategoriaService) { }
 
   ngOnInit() {
     this.setCurrentAction();
     this.buildLancamentoForm();
     this.loadLancamento();
+    this. loadCategorias();
   }
 
   ngAfterContentChecked(): void {
@@ -42,7 +68,17 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
     } else {
       this.atualizarLancamento();
     }
+  }
 
+  get tiposOptions(): Array<any> {
+    return Object.entries(Lancamento.tipos).map(
+      ([value, texto]) => {
+        return {
+          texto: texto,
+          value: value
+        };
+      }
+    );
   }
 
   private setCurrentAction() {
@@ -58,10 +94,10 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
       id: [null],
       nome: [null, [Validators.required, Validators.minLength(2)]],
       descricao: [null],
-      tipo: [null, [Validators.required]],
+      tipo: ['despesa', [Validators.required]],
       valor: [null, [Validators.required]],
       data: [null, [Validators.required]],
-      pago: [null, [Validators.required]],
+      paga: [true, [Validators.required]],
       categoriaId: [null, [Validators.required]],
     }
     );
@@ -80,6 +116,15 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
         (error) => alert ('Ocorreu um erro no servidor. Tente novamente mais tarde!')
         );
     }
+  }
+
+  loadCategorias() {
+    this.categoriaService.getAll()
+    .subscribe(cats => this.categorias = cats);
+  }
+
+  setPagamento(paga: boolean) {
+      this.lancamentoForm.get('paga').setValue(paga);
   }
 
   setPageTitle() {

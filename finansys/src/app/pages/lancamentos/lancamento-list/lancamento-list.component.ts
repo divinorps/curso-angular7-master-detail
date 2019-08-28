@@ -15,7 +15,7 @@ export class LancamentoListComponent implements OnInit {
 
   ngOnInit() {
     this.lancamentoService.getAll().subscribe(
-      lancamentos => this.lancamentos = lancamentos,
+      lancamentos => this.lancamentos = lancamentos.sort((a, b) => b.id - a.id),
       error => alert('Erro ao listar lançamentos')
     );
   }

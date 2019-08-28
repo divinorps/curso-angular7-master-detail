@@ -1,0 +1,54 @@
+{
+"categorias": [
+      {
+		  "id": 1, 
+		  "nome": "Moradia", 
+		  "descricao": "Pagamentos de contas da casa"
+	  },
+      {
+		  "id": 2, 
+		  "nome": "Saúde", 
+		  "descricao": "Pagamentos de saúde e remédios"
+	  },
+      {
+		  "id": 3, 
+		  "nome": "Lazer", 
+		  "descricao": "Cinama, parques, praia, etc"
+	  },
+      {
+		  "id": 4, 
+		  "nome": "Salário", 
+		  "descricao": "Recebimento de salário"
+	  },
+      {
+		  "id": 5, 
+		  "nome": "Freelas", 
+		  "descricao": "Trabalhos como freelancer"
+	  }
+    ],
+   "lancamentos": [
+      {
+		"id": 1, 
+		"nome": "Gás de cozinha", 
+		"descricao": "Gás de cozinha", 
+		"tipo": "despesa", 
+		"valor": "90,00", 
+		"data": "10/08/2019",  
+		"paga": true,  
+		"categoria": [
+		{"id": 1, "nome": "Moradia", "descricao": "Pagamentos de contas da casa"}]
+	  },
+      {
+		"id": 2, 
+		"nome": "Taxa de condomínio", 
+		"descricao": "Taxa de condomínio",
+		"tipo": "despesa",
+		"valor": "614,00",
+		"data": "26/08/2019", 
+		"paga": true, 
+		"categoria": [
+		{"id": 1, "nome": "Moradia", "descricao": "Pagamentos de contas da casa"}
+		]
+	}
+    ]
+}
