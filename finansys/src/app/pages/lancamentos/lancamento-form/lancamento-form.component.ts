@@ -137,7 +137,7 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
   }
 
   private adicionarLancamento() {
-    const lancamento: Lancamento = Object.assign(new Lancamento(), this.lancamentoForm.value);
+    const lancamento: Lancamento = Lancamento.fromJson(this.lancamentoForm.value);
     this.lancamentoService.adiciona(lancamento)
     .subscribe(
       (lancamento) => this.actionsForSuccess(lancamento)),
@@ -145,7 +145,7 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
   }
 
   private atualizarLancamento() {
-    const lancamento: Lancamento = Object.assign(new Lancamento(), this.lancamentoForm.value);
+    const lancamento: Lancamento = Lancamento.fromJson(this.lancamentoForm.value);
     this.lancamentoService.atualiza(lancamento)
     .subscribe(
       (lancamento) => this.actionsForSuccess(lancamento)),
@@ -165,7 +165,7 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
     if (error.status === 422) {
       this.ServerErrorMessages = JSON.parse(error._body).errors;
     } else {
-      this.ServerErrorMessages = ['Falha na comiunicação com o servidor. Tente novamente mais tarde!'];
+      this.ServerErrorMessages = ['Falha na comunicação com o servidor. Tente novamente!'];
     }
   }
 }

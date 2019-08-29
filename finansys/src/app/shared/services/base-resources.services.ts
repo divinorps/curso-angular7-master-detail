@@ -8,60 +8,59 @@ export abstract class BaseResourceService<T extends BaseResourceModel> {
 
   protected http: HttpClient;
 
-  constructor(protected URL: string, protected injector: Injector) {
+  constructor(protected URL: string, protected injector: Injector,
+              protected jsonDataToEntidadeFn: (jsonData: any) => T) {
     this.http = injector.get(HttpClient);
    }
 
   getAll(): Observable<T[]> {
     return this.http.get(this.URL).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToEntidades)
+      map(this.jsonDataToEntidades.bind(this)),
+      catchError(this.handleError)
     );
   }
 
   getPorId(id: number): Observable<T> {
     const url = `${this.URL}/${id}`;
     return this.http.get(url).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToEntidade)
+      map(this.jsonDataToEntidade.bind(this)),
+      catchError(this.handleError)
     );
   }
 
   adiciona(entidade: T): Observable<T> {
     return this.http.post(this.URL, entidade).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToEntidade)
+      map(this.jsonDataToEntidade.bind(this)),
+      catchError(this.handleError)
     );
   }
 
   atualiza(entidade: T): Observable<T> {
     const url = `${this.URL}/${entidade.id}`;
     return this.http.put(url, entidade).pipe(
-      catchError(this.handleError),
-      map(() => entidade)
+      map(() => entidade),
+      catchError(this.handleError)
     );
   }
 
   delete(id: number): Observable<any>{
     const url = `${this.URL}/${id}`;
     return this.http.delete(url).pipe(
-      catchError(this.handleError),
-      map(() => null)
+      map(() => null),
+      catchError(this.handleError)
     );
   }
 
   protected jsonDataToEntidades(jsonData: any[]): T[] {
     const entidades: T[] = [];
-     jsonData.forEach(element => {
-        const entidade = Object.assign (element)
-        entidades.push(entidade);
-     });
-     console.log( entidades );
-      return entidades;
+    jsonData.forEach(element =>  {
+      entidades.push( this.jsonDataToEntidadeFn(element) );
+    });
+    return entidades;
   }
 
   protected jsonDataToEntidade(jsonData: any): T {
-    return Object.assign (jsonData);
+    return  this.jsonDataToEntidadeFn(jsonData);
   }
 
   protected handleError(error: any): Observable<any> {
