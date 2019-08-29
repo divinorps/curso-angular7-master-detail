@@ -1,8 +1,6 @@
-import { AfterContentChecked, Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { switchMap } from 'rxjs/operators';
+import { Component, Injector, OnInit } from '@angular/core';
+import { Validators } from '@angular/forms';
+import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
 import { Categoria } from '../../categorias/shared/categoria.model';
 import { CategoriaService } from '../../categorias/shared/categoria.service';
 import { Lancamento } from '../shared/lancamento.model';
@@ -13,13 +11,8 @@ import { LancamentoService } from '../shared/lancamento.service';
   templateUrl: './lancamento-form.component.html',
   styleUrls: ['./lancamento-form.component.css']
 })
-export class LancamentoFormComponent implements OnInit, AfterContentChecked {
-  currentAction: string;
-  lancamentoForm: FormGroup;
-  pageTitulo: string;
-  ServerErrorMessages: string[] = null;
-  submmitingForm = false;
-  lancamento: Lancamento = new Lancamento();
+export class LancamentoFormComponent extends BaseResourceFormComponent<Lancamento> implements OnInit{
+
   categorias: Array<Categoria>;
 
   imaskConfig = {
@@ -43,32 +36,20 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
     clear: 'Limpar'
   };
 
-  constructor(private lancamentoService: LancamentoService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private formBuilder: FormBuilder,
-    private toastr: ToastrService,
-    private categoriaService: CategoriaService) { }
+  constructor(protected lancamentoService: LancamentoService, protected injector: Injector, protected categoriaService: CategoriaService) {
+    super(injector, new Lancamento(), lancamentoService, Lancamento.fromJson);
+   }
 
-  ngOnInit() {
-    this.setCurrentAction();
-    this.buildLancamentoForm();
-    this.loadLancamento();
-    this. loadCategorias();
-  }
+   ngOnInit() {
+    this.loadCategorias();
+    super.ngOnInit();
+   }
 
-  ngAfterContentChecked(): void {
-    this.setPageTitle();
-  }
-
-  enviarForm() {
-    this.submmitingForm = true;
-    if (this.currentAction === 'new') {
-      this.adicionarLancamento();
-    } else {
-      this.atualizarLancamento();
-    }
-  }
+   private loadCategorias() {
+    this.categoriaService.getAll().subscribe(
+      categorias => this.categorias = categorias
+    );
+   }
 
   get tiposOptions(): Array<any> {
     return Object.entries(Lancamento.tipos).map(
@@ -81,16 +62,8 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
     );
   }
 
-  private setCurrentAction() {
-    if (this.route.snapshot.url[0].path === 'new') {
-      this.currentAction = 'new';
-    } else {
-      this.currentAction = 'edit';
-    }
-  }
-
-  private buildLancamentoForm() {
-    this.lancamentoForm = this.formBuilder.group({
+  protected buildResourceForm() {
+    this.resourceForm = this.formBuilder.group({
       id: [null],
       nome: [null, [Validators.required, Validators.minLength(2)]],
       descricao: [null],
@@ -99,73 +72,20 @@ export class LancamentoFormComponent implements OnInit, AfterContentChecked {
       data: [null, [Validators.required]],
       paga: [true, [Validators.required]],
       categoriaId: [null, [Validators.required]],
-    }
-    );
-  }
-
-  private loadLancamento() {
-    if (this.currentAction === 'edit'){
-      this.route.paramMap.pipe(
-        switchMap(params => this.lancamentoService.getPorId(+params.get('id')))
-      )
-      .subscribe(
-        (lancamento) => {
-          this.lancamento = lancamento;
-          this.lancamentoForm.patchValue(lancamento);
-        },
-        (error) => alert ('Ocorreu um erro no servidor. Tente novamente mais tarde!')
-        );
-    }
-  }
-
-  loadCategorias() {
-    this.categoriaService.getAll()
-    .subscribe(cats => this.categorias = cats);
+    });
   }
 
   setPagamento(paga: boolean) {
-      this.lancamentoForm.get('paga').setValue(paga);
+      this.resourceForm.get('paga').setValue(paga);
   }
 
-  setPageTitle() {
-    if (this.currentAction === 'new') {
-      this.pageTitulo = 'Cadastro de novo lancamento';
-    } else {
-      const lancamentoNome = this.lancamento.nome || '';
-      this.pageTitulo = 'Alterando lancamento: ' + lancamentoNome;
-    }
+  protected novaPaginaTitulo() {
+    return 'Cadastro de novo lançamento';
   }
 
-  private adicionarLancamento() {
-    const lancamento: Lancamento = Lancamento.fromJson(this.lancamentoForm.value);
-    this.lancamentoService.adiciona(lancamento)
-    .subscribe(
-      (lancamento) => this.actionsForSuccess(lancamento)),
-      (error: any) => this.actionsForError(error);
+  protected editarPaginaTitulo() {
+    const nomeLancamento = this.resource.nome || '';
+    return 'Alteração de lançamento: ' +  nomeLancamento;
   }
 
-  private atualizarLancamento() {
-    const lancamento: Lancamento = Lancamento.fromJson(this.lancamentoForm.value);
-    this.lancamentoService.atualiza(lancamento)
-    .subscribe(
-      (lancamento) => this.actionsForSuccess(lancamento)),
-      (error: any) => this.actionsForError(error);
-  }
-
-  private actionsForSuccess(lancamento: Lancamento) {
-    this.toastr.success('Solicitação processada com sucesso.');
-    this.router.navigateByUrl('lancamentos', { skipLocationChange: true}).then(
-      () => this.router.navigate(['lancamentos', lancamento.id, 'edit'])
-    );
-  }
-
-  private actionsForError(error: any) {
-    this.toastr.error('Ocorreu um erro ao processar sua solicitação');
-    this.submmitingForm = false;
-    if (error.status === 422) {
-      this.ServerErrorMessages = JSON.parse(error._body).errors;
-    } else {
-      this.ServerErrorMessages = ['Falha na comunicação com o servidor. Tente novamente!'];
-    }
-  }
 }
