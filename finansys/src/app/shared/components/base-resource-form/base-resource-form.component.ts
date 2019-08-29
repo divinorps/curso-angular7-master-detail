@@ -1,8 +1,8 @@
 import { AfterContentChecked, Injector, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { switchMap } from 'rxjs/operators';
+import toastr from 'toastr';
 import { BaseResourceModel } from '../../models/base-resource.model';
 import { BaseResourceService } from '../../services/base-resources.services';
 
@@ -21,7 +21,6 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
     protected injector: Injector,
     public resource: T,
     private resourceService: BaseResourceService<T>,
-    protected toastr: ToastrService,
     protected jsonDataToResourceFn: (jsonData) => T
     ) {
       this.route = this.injector.get(ActivatedRoute);
@@ -102,7 +101,7 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
   }
 
   protected actionsForSuccess(resource: T) {
-    this.toastr.success('Solicitação processada com sucesso.');
+    toastr.success('Solicitação processada com sucesso.');
     const baseURLComponent = this.route.snapshot.parent.url[0].path;
     this.router.navigateByUrl(baseURLComponent, { skipLocationChange: true}).then(
       () => this.router.navigate([baseURLComponent, resource.id, 'edit'])
@@ -111,7 +110,7 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
   }
 
   protected actionsForError(error: any) {
-    this.toastr.error('Ocorreu um erro ao processar sua solicitação');
+    toastr.error('Ocorreu um erro ao processar sua solicitação');
     this.submmitingForm = false;
     if (error.status === 422) {
       this.ServerErrorMessages = JSON.parse(error._body).errors;
