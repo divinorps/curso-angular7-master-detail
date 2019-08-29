@@ -13,9 +13,6 @@ export class CategoriaListComponent implements OnInit {
   constructor(private categoriaService: CategoriaService) { }
 
   ngOnInit() {
-    // this.categoriaService.listar()
-    // .subscribe((cats) => this.categorias = cats);
-
     this.categoriaService.getAll().subscribe(
       categorias => this.categorias = categorias,
       error => alert('Erro ao listar categorias' + error.json())

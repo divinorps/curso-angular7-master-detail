@@ -1,5 +1,10 @@
-export class Categoria {
-  constructor(public id?: number,
+import { BaseResourceModel } from 'src/app/shared/models/base-resource.model';
+
+export class Categoria extends BaseResourceModel {
+  constructor(
     public nome?: string,
-    public descricao?: string) {}
+    public descricao?: string) {
+      super();
+    }
+
 }
