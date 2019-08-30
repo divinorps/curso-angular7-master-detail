@@ -24,7 +24,7 @@ export class Lancamento extends BaseResourceModel {
     }
 
     get pagaText(): string {
-        return this.paga ? 'Pago' : 'Pendente';
+       return this.paga ? 'Pago' : 'Pendente';
     }
 
 }
