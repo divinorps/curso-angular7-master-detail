@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { BaseResourceListComponent } from 'src/app/shared/components/base-resource-list/base-resource-list.compont';
 import { Categoria } from '../shared/categoria.model';
 import { CategoriaService } from '../shared/categoria.service';
 
@@ -7,26 +8,11 @@ import { CategoriaService } from '../shared/categoria.service';
   templateUrl: './categoria-list.component.html',
   styleUrls: ['./categoria-list.component.css']
 })
-export class CategoriaListComponent implements OnInit {
+export class CategoriaListComponent extends BaseResourceListComponent<Categoria> {
   categorias: Categoria[] = [];
 
-  constructor(private categoriaService: CategoriaService) { }
-
-  ngOnInit() {
-    this.categoriaService.getAll().subscribe(
-      categorias => this.categorias = categorias,
-      error => alert('Erro ao listar categorias' + error.json())
-    );
-  }
-
-  removeCategoria(categoria: Categoria) {
-    const confirmouExclusao = confirm('Deseja realmente remover esta categoria?');
-    if (confirmouExclusao) {
-      this.categoriaService.delete(categoria.id).subscribe(
-        () => this.categorias = this.categorias.filter(cat => cat !== categoria),
-        () => alert('Erro ao tentar excluir categoria!')
-      );
-    }
-  }
+  constructor(private categoriaService: CategoriaService) {
+    super(categoriaService);
+   }
 
 }
