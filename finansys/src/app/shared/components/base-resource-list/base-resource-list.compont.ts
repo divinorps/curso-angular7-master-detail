@@ -3,6 +3,7 @@ import { BaseResourceModel } from '../../models/base-resource.model';
 import { BaseResourceService } from '../../services/base-resources.services';
 
 export class BaseResourceListComponent<T extends BaseResourceModel> implements OnInit {
+
   resources: T[] = [];
 
   constructor(private baseResourceService: BaseResourceService<T>) { }
@@ -10,7 +11,7 @@ export class BaseResourceListComponent<T extends BaseResourceModel> implements O
   ngOnInit() {
     this.baseResourceService.getAll().subscribe(
       resources => this.resources = resources,
-      error => alert('Erro ao listar categorias' + error.json())
+      error => alert('Erro ao carregar registros' + error.json())
     );
   }
 

@@ -26,7 +26,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let lancamento of lancamentos">
+        <tr *ngFor="let lancamento of resources">
           <td>
             <strong>{{ lancamento.nome }}</strong><br>
             <small class="text-success">{{ lancamento.data }}</small><br>
@@ -44,7 +44,7 @@
         </td>
         <td class="text-center">
             <a [routerLink]="[lancamento.id, 'edit']" class="btn btn-outline-info sm mr-2">Editar</a>
-            <button (click)="removeLancamento(lancamento)" class="btn btn-outline-danger sm">Excluir</button>
+            <button (click)="removeResource(lancamento)" class="btn btn-outline-danger sm">Excluir</button>
           </td>
         </tr>
       </tbody>

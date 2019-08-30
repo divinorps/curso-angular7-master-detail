@@ -11,7 +11,7 @@ import { CategoriaService } from '../shared/categoria.service';
 export class CategoriaListComponent extends BaseResourceListComponent<Categoria> {
   categorias: Categoria[] = [];
 
-  constructor(private categoriaService: CategoriaService) {
+  constructor(protected categoriaService: CategoriaService) {
     super(categoriaService);
    }
 
